@@ -23,6 +23,7 @@ function init_settings() {
   set_default("icon","true");
   set_default("jque","true");
   set_default("badge","true");
+  set_default("recaptcha","true");
 }
 init_settings();
 
@@ -73,13 +74,23 @@ function nogapi(details){
       if(result['cancel']===undefined)
           return result;
   }
-  
+
   push(details,'重定向 Google API');
   return {redirectUrl: url.replace(".googleapis.com/",".proxy.ustclug.org/")};
 }
-var nogapi_filter={
-  urls:["*://ajax.googleapis.com/*","*://fonts.googleapis.com/*"],
-  types:["stylesheet","script"]};
+
+  function recaptcha(details){
+    var url=details.url;
+    //try redirect jquery first
+    if(localStorage["jque"]==="true") {
+        var result=nojque(details);
+        if(result['cancel']===undefined)
+            return result;
+    }
+
+  push(details,'重定向 Google 验证');
+  return {redirectUrl: url.replace("www.google.com/recaptcha","recaptcha.net/recaptcha")};
+}
 
 function nogser(details){
   push(details,'拦截无效服务');
